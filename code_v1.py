@@ -119,17 +119,49 @@ fb['ma50'] = fb['Close'].rolling(50).mean()
 
 #plot the moving average
 plt.figure(figsize=(10, 8))
-fb['ma50'].loc['2015-01-01':'2015-12-31'].plot(label='MA50')
+fb['MA50'].loc['2015-01-01':'2015-12-31'].plot(label='MA50')
 fb['Close'].loc['2015-01-01':'2015-12-31'].plot(label='Close')
 plt.legend()
 plt.show()
 
 #%%
 # Simple trading strategy
+# If MA10>MA50 -> buy and hold one share of stock
 
+ms['MA10'] = ms['Close'].rolling(10).mean()
+ms['MA50'] = ms['Close'].rolling(50).mean()
+#%%
+plt.figure(figsize=(10, 8))
+ms['Close'].plot()
+ms['MA10'].plot()
+ms['MA50'].plot()
+plt.legend()
+plt.show()
+#%%
 
+ms['Shares'] = [ 1 if ms.loc[ei,'MA10']>ms.loc[ei,'MA50'] else 0
+                for ei in ms.index] # shows if we should go long or not
+ms['Close1']=ms['Close'].shift(-1) # Tomorrow's close price
+ms.iloc[500:505,:]
 
+# Calculating profits
+ms['Profit']=[ms.loc[ei,'Close1']-ms.loc[ei,'Close']
+              if ms.loc[ei,'Shares']==1 # if we have stocks at hand, the profit 
+                          # is tomorrow's price minus today's price
+              else 0 for ei in ms.index]
+# Plot profit
+ms['Profit'].plot()
+plt.axhline(y=0,color='red')
 
+# Cumulative profit
+ms['wealth']=ms['Profit'].cumsum() # Cumulative sum of profits
+ms.tail()
 
+# To realise this profit
 
-
+print("Total money you win is ", ms.loc[ms.index[-2], 'wealth']) # -2 index because the
+            # last numver of close1 is nan (wealth should also be nan)
+print("Total money you spent is ", ms.loc[ms.index[0],'Close'])
+#%%
+ms['wealth'].plot()
+plt.title('Total money you win is {}'.format(ms.loc[ms.index[-2],'wealth']))
