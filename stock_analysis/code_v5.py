@@ -60,7 +60,12 @@ indicepanel['Price']=spy['Open']
 
 indicepanel.head() # empty first row because of lag
 
+#%%
+################
 #Data munging
+################
+
+#%%
 indicepanel=indicepanel.fillna(method='ffill') # use forward fill to get rid of NaN values
 indicepanel.isnull().sum() # show how many NaN's we have
 indicepanel=indicepanel.dropna() # drop the NaN's
@@ -72,9 +77,11 @@ indicepanel.to_csv('indicepanel.csv') # save the dataframe to a csv file
 indicepanel.shape
 
 #%%
-
+###################
 # Data splitting
+####################
 
+#%%
 Train=indicepanel.iloc[-2000:-1000,:] # Training set (1000 days before the test data days)
 Test=indicepanel.iloc[-1000:,:] # Test set to see if trained set can reasonably predict
                                 # We test the trained model on the last 1000 days
@@ -104,16 +111,20 @@ lm.summary()
 Train.iloc[:,:-1].corr() # we see quite high correlations between the variables
 
 #%%
-
+####################
 # Making prediction
+###################
+#%%
 Train['PredictedY']=lm.predict(Train)
 Test['PredictedY']=lm.predict(Test)
 
 plt.scatter(Train['spy'], Train['PredictedY'])
 
 #%%
-
+###################
 # Model evaluation:
+##################
+#%%
 # Some statistics for tests:
             # RMSE - root mean square error
             # Adjusted R^2
